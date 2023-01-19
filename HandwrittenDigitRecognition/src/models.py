@@ -141,6 +141,64 @@ class MyConNet3(nn.Module):
         return x
 
 
+class MyConNet4(nn.Module):
+
+    def __init__(self):
+        super(MyConNet4, self).__init__()
+
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=8, kernel_size=5, stride=1)
+        self.norm2d1 = nn.BatchNorm2d(8)
+        self.activ1 = nn.ReLU()
+        self.drop1 = nn.Dropout(p=0.3)
+
+        self.conv2 = nn.Conv2d(in_channels=8, out_channels=32, kernel_size=5, stride=1)
+        self.norm2d2 = nn.BatchNorm2d(32)
+        self.activ2 = nn.ReLU()
+        self.drop2 = nn.Dropout(p=0.3)
+
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5, stride=1)
+        self.norm2d3 = nn.BatchNorm2d(32)
+        self.activ3 = nn.ReLU()
+        self.drop3 = nn.Dropout(p=0.3)
+
+        self.dense1 = nn.Linear(in_features=32 * 16 * 16, out_features=560)
+        self.norm1d1 = nn.BatchNorm1d(560)
+        self.activ4 = nn.Tanh()
+        self.drop4 = nn.Dropout(p=0.3)
+
+        self.dense3 = nn.Linear(in_features=560, out_features=10)
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.conv1(x)
+        x = self.norm2d1(x)
+        x = self.activ1(x)
+
+        x = self.drop1(x)
+
+        x = self.conv2(x)
+        x = self.norm2d2(x)
+        x = self.activ2(x)
+
+        x = self.drop2(x)
+
+        x = self.conv3(x)
+        x = self.norm2d2(x)
+        x = self.activ3(x)
+
+        x = x.view(-1, 32 * 16 * 16)
+        x = self.drop3(x)
+
+        x = self.dense1(x)
+        x = self.norm1d1(x)
+        x = self.activ4(x)
+
+        x = self.drop4(x)
+
+        x = self.dense3(x)
+
+        return x
+
+
 class LeNet5Variant(nn.Module):
     def __init__(self):
         super(LeNet5Variant, self).__init__()
