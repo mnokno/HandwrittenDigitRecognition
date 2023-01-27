@@ -28,6 +28,11 @@ class MyTrainer:
             for i, data in enumerate(train_dataloader):
                 # Every data instance is an input + label pair
                 inputs, labels = data
+
+                if torch.cuda.is_available():
+                    inputs = inputs.cuda()
+                    labels = labels.cuda()
+
                 # Zero your gradients for every batch!
                 self.optimizer.zero_grad()
                 # Make predictions for this batch
@@ -47,6 +52,11 @@ class MyTrainer:
                     for i, data in enumerate(test_dataloader):
                         # Every data instance is an input + label pair
                         inputs, labels = data
+
+                        if torch.cuda.is_available():
+                            inputs = inputs.cuda()
+                            labels = labels.cuda()
+
                         output = self.model(inputs)
                         loss = self.loss_fn(output, labels)
                         losses.append(loss.item())
