@@ -207,6 +207,59 @@ class MyConNet4(nn.Module):
         return x
 
 
+class MyConNet5(nn.Module):
+
+    def __init__(self):
+        super(MyConNet5, self).__init__()
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=5, stride=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=5, stride=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(in_channels=128, out_channels=512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+        )
+
+        self.linear = nn.Sequential(
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=512 * 9 * 9, out_features=512 * 9),
+            nn.BatchNorm1d(512 * 9),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=512 * 9, out_features=512),
+            nn.BatchNorm1d(512),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=512, out_features=64),
+            nn.BatchNorm1d(64),
+            nn.LeakyReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(in_features=64, out_features=10),
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.conv(x)
+        x = x.view(x.size(0), -1)
+        x = self.linear(x)
+        return x
+
+
 class LeNet5Variant(nn.Module):
     def __init__(self):
         super(LeNet5Variant, self).__init__()
