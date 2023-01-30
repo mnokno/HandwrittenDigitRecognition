@@ -293,17 +293,17 @@ class MyConNet6(nn.Module):
 
             nn.Linear(in_features=512 * 7 * 7, out_features=512 * 7),
             nn.BatchNorm1d(512 * 7),
-            nn.LeakyReLU(),
+            nn.ReLU(),
             nn.Dropout(0.5),
 
             nn.Linear(in_features=512 * 7, out_features=512),
             nn.BatchNorm1d(512),
-            nn.LeakyReLU(),
+            nn.ReLU(),
             nn.Dropout(0.5),
 
             nn.Linear(in_features=512, out_features=64),
             nn.BatchNorm1d(64),
-            nn.LeakyReLU(),
+            nn.ReLU(),
             nn.Dropout(0.5),
 
             nn.Linear(in_features=64, out_features=10),
