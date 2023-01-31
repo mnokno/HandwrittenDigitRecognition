@@ -7,6 +7,7 @@ class MyTrainer:
         self.model = model
         self.optimizer = optimizer
         self.loss_fn = loss_fn
+        self._check_optim_net_aligned()
 
     # Ensures that the given optimizer points to the given model
     def _check_optim_net_aligned(self):
@@ -16,15 +17,20 @@ class MyTrainer:
     def fit(self,
             train_dataloader: DataLoader,
             test_dataloader: DataLoader,
-            epochs: int = 100,
-            eval_every: int = 10,
-            early_stopping: bool = True):
+            epochs: int = 50,
+            eval_every: int = 1,
+            early_stopping: bool = True,
+            sub_epoch_logs: bool = False,
+            sub_epoch_percentile: float = 0.1):
 
+        # Stores the current best loss, used to abort training early,
+        # helps to prevent over-fitting
         best_loss = 1e9
 
         for e in range(epochs):
             # Make sure gradient tracking is on, and do a pass over the data
             self.model.train(True)
+            print(len(train_dataloader))
             for i, data in enumerate(train_dataloader):
                 # Every data instance is an input + label pair
                 inputs, labels = data
@@ -61,15 +67,15 @@ class MyTrainer:
                         loss = self.loss_fn(output, labels)
                         losses.append(loss.item())
 
-                    avg_loss = round(torch.Tensor(losses).mean().item(), 4)
+                    avg_loss = torch.Tensor(losses).mean().item()
 
                     if early_stopping:
                         if avg_loss < best_loss:
                             best_loss = avg_loss
-                            print("The loss after", (e + 1), "epochs was", avg_loss)
+                            print("The loss after", (e + 1), "epochs was", round(avg_loss, 4))
                         else:
-                            print("The loss after", (e + 1), "epochs was", avg_loss)
-                            print("The loss had increased since the last checkpoint, stopping training!")
+                            print("The loss after", (e + 1), "epochs was", round(avg_loss, 4))
+                            print("The loss had increased since the last checkpoint, aborting training!")
                             break
                     else:
-                        print("The loss after", (e + 1), "epochs was", avg_loss)
+                        print("The loss after", (e + 1), "epochs was", round(avg_loss, 4))
