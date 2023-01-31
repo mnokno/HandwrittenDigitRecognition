@@ -97,6 +97,8 @@ class MyTrainer:
                         else:
                             print("\nThe loss after", (e + 1), "epochs was", round(avg_loss, 4))
                             print("The loss had increased since the last checkpoint, aborting training!", "\n")
+                            # revers to the previse model sice the current one is worse
+                            self.model.load_state_dict(torch.load("check_points/model_checkpoint_e" + str(e) + ".pt"))
                             break
                     else:
                         print("\nThe loss after", (e + 1), "epochs was", round(avg_loss, 4), "\n")
