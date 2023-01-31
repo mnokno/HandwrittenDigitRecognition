@@ -26,11 +26,17 @@ class MyTrainer:
         # Stores the current best loss, used to abort training early,
         # helps to prevent over-fitting
         best_loss = 1e9
+        # Used to perform sub batch eval
+        batch_log_every = len(train_dataloader) * sub_epoch_percentile
 
         for e in range(epochs):
             # Make sure gradient tracking is on, and do a pass over the data
             self.model.train(True)
-            print(len(train_dataloader))
+
+            # Stores data about the batch
+            batch_losses = []
+            sub_batch_losses = []
+
             for i, data in enumerate(train_dataloader):
                 # Every data instance is an input + label pair
                 inputs, labels = data
@@ -48,6 +54,21 @@ class MyTrainer:
                 loss.backward()
                 # Adjust learning weights
                 self.optimizer.step()
+
+                # Saves data
+                batch_losses.append(loss)
+                sub_batch_losses.append(loss)
+
+                # Performs sub batch log
+                if sub_epoch_logs and (i + 1) % batch_log_every == 0:
+                    print('Train Epoch: {} [{}/{} ({:.0f}%)]\t\tLoss: {:.6f}'.format(
+                        e, (i + 1) * train_dataloader.batch_size,
+                        len(train_dataloader) * train_dataloader.batch_size,
+                        100.0 * (i + 1) / len(train_dataloader), torch.Tensor(sub_batch_losses).mean()))
+                    sub_batch_losses.clear()
+
+            # Reports on the path
+            print('Train Epoch: {} Average Loss: {:.6f}'.format(e, torch.Tensor(batch_losses).mean()))
 
             # Reports on the training progress
             if (e + 1) % eval_every == 0:
@@ -72,10 +93,10 @@ class MyTrainer:
                     if early_stopping:
                         if avg_loss < best_loss:
                             best_loss = avg_loss
-                            print("The loss after", (e + 1), "epochs was", round(avg_loss, 4))
+                            print("\nThe loss after", (e + 1), "epochs was", round(avg_loss, 4), "\n")
                         else:
-                            print("The loss after", (e + 1), "epochs was", round(avg_loss, 4))
-                            print("The loss had increased since the last checkpoint, aborting training!")
+                            print("\nThe loss after", (e + 1), "epochs was", round(avg_loss, 4))
+                            print("The loss had increased since the last checkpoint, aborting training!", "\n")
                             break
                     else:
-                        print("The loss after", (e + 1), "epochs was", round(avg_loss, 4))
+                        print("\nThe loss after", (e + 1), "epochs was", round(avg_loss, 4), "\n")
