@@ -3,10 +3,11 @@ from torch.utils.data import DataLoader
 
 
 class MyTrainer:
-    def __init__(self, model, optimizer, loss_fn):
+    def __init__(self, model, optimizer, loss_fn, lr_scheduler):
         self.model = model
         self.optimizer = optimizer
         self.loss_fn = loss_fn
+        self.lr_scheduler = lr_scheduler
         self._check_optim_net_aligned()
 
     # Ensures that the given optimizer points to the given model
@@ -54,6 +55,9 @@ class MyTrainer:
                 loss.backward()
                 # Adjust learning weights
                 self.optimizer.step()
+                # Adjusts learning rate
+                if self.lr_scheduler is not None:
+                    self.lr_scheduler.step()
 
                 # Saves data
                 batch_losses.append(loss)
