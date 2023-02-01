@@ -55,9 +55,6 @@ class MyTrainer:
                 loss.backward()
                 # Adjust learning weights
                 self.optimizer.step()
-                # Adjusts learning rate
-                if self.lr_scheduler is not None:
-                    self.lr_scheduler.step()
 
                 # Saves data
                 batch_losses.append(loss)
@@ -71,6 +68,9 @@ class MyTrainer:
                         100.0 * (i + 1) / len(train_dataloader), torch.Tensor(sub_batch_losses).mean()))
                     sub_batch_losses.clear()
 
+            # Adjusts learning rate
+            if self.lr_scheduler is not None:
+                self.lr_scheduler.step()
             # Reports on the path
             print('Train Epoch: {} Average Loss: {:.6f}'.format(e, torch.Tensor(batch_losses).mean()))
 
