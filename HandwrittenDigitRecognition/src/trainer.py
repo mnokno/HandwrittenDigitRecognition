@@ -31,6 +31,8 @@ class MyTrainer:
         batch_log_every = len(train_dataloader) * sub_epoch_percentile
 
         for e in range(epochs):
+            # Logs learning rate
+            print("Current learning rate: {}".format(self.lr_scheduler.get_last_lr()))
             # Make sure gradient tracking is on, and do a pass over the data
             self.model.train(True)
 
