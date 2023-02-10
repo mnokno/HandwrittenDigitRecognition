@@ -266,44 +266,49 @@ class MyConNet6(nn.Module):
         super(MyConNet6, self).__init__()
 
         self.conv = nn.Sequential(
-            # 28x28
-            nn.Conv2d(in_channels=1, out_channels=64, kernel_size=5, stride=1, padding=2),
+            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=5, stride=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=5, stride=1),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            # 28x28
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=5, stride=1, padding=2),
+
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1),
             nn.BatchNorm2d(128),
             nn.ReLU(),
-            # 28x28
+
             nn.MaxPool2d(kernel_size=2, stride=2),
-            # 14x14
+
             nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(256),
             nn.ReLU(),
-            # 14x14
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            # 7x7
-            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
+
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
             nn.ReLU(),
+
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU()
         )
 
         self.linear = nn.Sequential(
             nn.Dropout(0.5),
 
-            nn.Linear(in_features=512 * 7 * 7, out_features=512 * 7),
-            nn.BatchNorm1d(512 * 7),
-            nn.ReLU(),
+            nn.Linear(in_features=256 * 9 * 9, out_features=256 * 9),
+            nn.BatchNorm1d(256 * 9),
+            nn.LeakyReLU(),
             nn.Dropout(0.5),
 
-            nn.Linear(in_features=512 * 7, out_features=512),
-            nn.BatchNorm1d(512),
-            nn.ReLU(),
+            nn.Linear(in_features=256 * 9, out_features=256),
+            nn.BatchNorm1d(256),
+            nn.LeakyReLU(),
             nn.Dropout(0.5),
 
-            nn.Linear(in_features=512, out_features=64),
+            nn.Linear(in_features=256, out_features=64),
             nn.BatchNorm1d(64),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Dropout(0.5),
 
             nn.Linear(in_features=64, out_features=10),
